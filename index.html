@@ -1,0 +1,3063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness AI - Premium Smart Assistant & Dashboard</title>
+    
+    <!-- Google Fonts: Outfit for sleek, modern appearance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons for premium visual icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Chart.js for premium responsive charting -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Modern Reset and Custom Properties */
+        :root {
+            --bg-base: #080c14;
+            --bg-surface: rgba(17, 24, 39, 0.6);
+            --bg-surface-hover: rgba(26, 36, 57, 0.7);
+            --border-color: rgba(255, 255, 255, 0.05);
+            --border-hover: rgba(255, 255, 255, 0.12);
+            
+            --primary: #10b981; /* Neon green */
+            --primary-glow: rgba(16, 185, 129, 0.15);
+            --secondary: #06b6d4; /* Cyber Cyan */
+            --secondary-glow: rgba(6, 182, 212, 0.15);
+            --accent: #8b5cf6; /* Royal Violet */
+            --accent-glow: rgba(139, 92, 246, 0.15);
+            --danger: #f43f5e; /* Coral red */
+            
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-dim: #64748b;
+            
+            --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            position: relative;
+        }
+
+        /* Glowing background blobs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%;
+            left: -10%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -15%;
+            right: -10%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Layout Container */
+        .app-container {
+            display: flex;
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Desktop Sidebar styling */
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            background: rgba(11, 15, 26, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 50;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-main);
+            margin-bottom: 2.5rem;
+        }
+
+        .brand-logo {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            color: var(--bg-base);
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, var(--text-main), #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-name span {
+            color: var(--primary);
+            -webkit-text-fill-color: var(--primary);
+        }
+
+        .menu-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .menu-item-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1.25rem;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-family: var(--font-family);
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-item-btn:hover {
+            color: var(--text-main);
+            background: var(--bg-surface-hover);
+            border-color: var(--border-color);
+        }
+
+        .menu-item-btn.active {
+            color: var(--text-main);
+            background: var(--primary-glow);
+            border-color: rgba(16, 185, 129, 0.25);
+            box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.05);
+        }
+
+        .menu-item-btn i, .menu-item-btn svg {
+            width: 20px;
+            height: 20px;
+            transition: var(--transition);
+        }
+
+        .menu-item-btn.active i, .menu-item-btn.active svg {
+            color: var(--primary);
+            transform: scale(1.08);
+        }
+
+        /* Profile summary in Sidebar */
+        .sidebar-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+
+        .profile-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--text-main);
+            border: 2px solid var(--border-color);
+        }
+
+        .profile-details {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .profile-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        .profile-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Main Workspace Panel */
+        .main-workspace {
+            flex: 1;
+            padding: 2.5rem 3rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding-bottom: 6rem; /* Extra spacing for mobile navigation spacing */
+        }
+
+        /* Header Area */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1.5rem;
+        }
+
+        .user-welcome h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.25rem;
+            background: linear-gradient(to right, var(--text-main), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-welcome p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .date-badge {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Premium Glass Card Base styling */
+        .glass-card {
+            background: var(--bg-surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+
+        .glass-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Section Layouts (SPA Views) */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Dashboard Overview Layout */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-info h3 {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-info .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-info .target {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calories-theme .stat-icon {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--danger);
+        }
+        .steps-theme .stat-icon {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary);
+        }
+        .minutes-theme .stat-icon {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--secondary);
+        }
+        .water-theme .stat-icon {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent);
+        }
+
+        /* SVG Circular Progress Ring */
+        .progress-ring-container {
+            position: relative;
+            width: 64px;
+            height: 64px;
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        /* Water Tracker Widget */
+        .water-dashboard-widget {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .glass-water-visualizer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 2rem;
+        }
+
+        .water-cup-container {
+            width: 80px;
+            height: 120px;
+            border: 3px solid rgba(255, 255, 255, 0.15);
+            border-top: none;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.02);
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+
+        .water-cup-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(180deg, rgba(6, 182, 212, 0.6), rgba(139, 92, 246, 0.8));
+            transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+        }
+
+        .water-cup-wave {
+            position: absolute;
+            top: -6px;
+            left: 0;
+            width: 200%;
+            height: 10px;
+            background: radial-gradient(circle, transparent 20%, rgba(6, 182, 212, 0.6) 21%, rgba(6, 182, 212, 0.6) 35%, transparent 36%);
+            background-size: 20px 20px;
+            animation: waterWave 2s linear infinite;
+        }
+
+        @keyframes waterWave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .water-controls {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .water-add-btn {
+            background: var(--bg-surface-hover);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            font-family: var(--font-family);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .water-add-btn:hover {
+            background: var(--secondary-glow);
+            border-color: rgba(6, 182, 212, 0.3);
+            color: var(--secondary);
+            transform: scale(1.03);
+        }
+
+        .water-add-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* AI coach quote card styling */
+        .ai-quote-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(6, 182, 212, 0.08));
+            border-color: rgba(16, 185, 129, 0.15);
+            display: flex;
+            gap: 1.25rem;
+            align-items: flex-start;
+        }
+
+        .ai-avatar-icon {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-base);
+            flex-shrink: 0;
+            animation: pulseGlow 3s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.2); }
+            100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
+        }
+
+        .ai-quote-text h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.35rem;
+        }
+
+        .ai-quote-text p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* AI Coach Chat Interface */
+        .chat-view-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+            height: calc(100vh - 180px);
+            min-height: 500px;
+        }
+
+        .chat-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-sidebar h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .prompt-chip {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-align: left;
+            transition: var(--transition);
+            line-height: 1.4;
+        }
+
+        .prompt-chip:hover {
+            color: var(--text-main);
+            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.05);
+            transform: translateX(4px);
+        }
+
+        .chat-main {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: rgba(11, 15, 26, 0.4);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message-bubble {
+            max-width: 75%;
+            padding: 1rem;
+            border-radius: 16px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            animation: messageSlideIn 0.3s ease-out forwards;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-bubble.user {
+            background: var(--primary-glow);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--text-main);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-bubble.assistant {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-bubble.assistant p {
+            margin-bottom: 0.75rem;
+        }
+        .message-bubble.assistant p:last-child {
+            margin-bottom: 0;
+        }
+        .message-bubble.assistant ul, .message-bubble.assistant ol {
+            margin-left: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+        .message-bubble.assistant li {
+            margin-bottom: 0.25rem;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 0.35rem;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text-dim);
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .chat-input-bar {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.75rem;
+            background: rgba(11, 15, 26, 0.6);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.85rem 1.25rem;
+            color: var(--text-main);
+            font-family: var(--font-family);
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .chat-input:focus {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.02);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+        }
+
+        .chat-send-btn {
+            background: var(--primary);
+            color: var(--bg-base);
+            border: none;
+            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chat-send-btn:hover {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* Workout Planner Form */
+        .workout-view-grid {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .workout-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-field label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-select, .form-input {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            font-family: var(--font-family);
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .form-select:focus, .form-input:focus {
+            border-color: rgba(6, 182, 212, 0.4);
+        }
+
+        .form-select option {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+        }
+
+        .workout-gen-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--bg-base);
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-family: var(--font-family);
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .workout-gen-btn:hover {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+            transform: scale(1.02);
+        }
+
+        .workout-results-area {
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .empty-placeholder {
+            text-align: center;
+            color: var(--text-dim);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .empty-placeholder i, .empty-placeholder svg {
+            width: 48px;
+            height: 48px;
+            stroke-width: 1.5;
+            color: var(--text-dim);
+        }
+
+        /* Generated Workout Plan Interface */
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .plan-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .plan-meta {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .meta-tag {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .exercise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .exercise-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+
+        .exercise-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .exercise-item.completed {
+            opacity: 0.6;
+            border-color: var(--primary-glow);
+        }
+
+        .exercise-item.completed .exercise-name {
+            text-decoration: line-through;
+            color: var(--text-dim);
+        }
+
+        .exercise-details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .exercise-checkbox-btn {
+            background: transparent;
+            border: 2px solid var(--text-dim);
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .exercise-checkbox-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .exercise-item.completed .exercise-checkbox-btn {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--bg-base);
+        }
+
+        .exercise-info h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .exercise-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .exercise-stats {
+            text-align: right;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .exercise-stats span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-weight: 400;
+            margin-top: 0.15rem;
+        }
+
+        /* REST TIMER WIDGET */
+        .rest-timer-widget {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.05), rgba(139, 92, 246, 0.05));
+            border: 1px solid rgba(6, 182, 212, 0.15);
+            padding: 1.25rem 1.5rem;
+            border-radius: 16px;
+            margin-top: 1.5rem;
+        }
+
+        .timer-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .timer-icon-wrapper {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--secondary);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timer-text h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+        }
+
+        .timer-text p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .timer-controls-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .timer-clock {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-main);
+        }
+
+        .timer-action-btn {
+            background: var(--bg-surface-hover);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .timer-action-btn:hover {
+            background: var(--secondary-glow);
+            border-color: rgba(6, 182, 212, 0.25);
+            color: var(--secondary);
+        }
+
+        /* Nutrition Panel Grid */
+        .nutrition-view-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .nutrition-card-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .macro-tracker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .macro-tracker-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .macro-tracker-header span {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Horizontal progress bars for macros */
+        .macro-bar-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .macro-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .macro-label .name {
+            color: var(--text-secondary);
+        }
+
+        .macro-label .fraction {
+            font-weight: 600;
+        }
+
+        .macro-bar-track {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 99px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .macro-bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.5s ease-out;
+        }
+
+        .protein-fill { background: linear-gradient(to right, var(--primary), #34d399); }
+        .carbs-fill { background: linear-gradient(to right, var(--secondary), #22d3ee); }
+        .fats-fill { background: linear-gradient(to right, var(--accent), #a78bfa); }
+
+        /* Meal Logs List */
+        .meal-log-list {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 0.25rem;
+        }
+
+        .meal-log-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.85rem 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+
+        .meal-log-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .meal-meta h5 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+        }
+
+        .meal-meta span {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .meal-stats {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .meal-calories {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            text-align: right;
+        }
+
+        .meal-calories span {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-weight: 400;
+            margin-top: 0.1rem;
+        }
+
+        .meal-delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .meal-delete-btn:hover {
+            color: var(--danger);
+            transform: scale(1.1);
+        }
+
+        /* AI smart parser input widget */
+        .ai-parser-card {
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.02), rgba(6, 182, 212, 0.02));
+        }
+
+        .ai-parser-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-parser-header h4 {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .parser-textarea {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 100%;
+            height: 90px;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-family: var(--font-family);
+            font-size: 0.9rem;
+            resize: none;
+            outline: none;
+            transition: var(--transition);
+            margin-bottom: 0.75rem;
+        }
+
+        .parser-textarea:focus {
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+
+        .parser-submit-btn {
+            background: var(--primary);
+            color: var(--bg-base);
+            border: none;
+            border-radius: 10px;
+            padding: 0.65rem 1.25rem;
+            font-family: var(--font-family);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .parser-submit-btn:hover {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Analytics Tab Grid styling */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 280px;
+            position: relative;
+        }
+
+        /* Profile Forms setting page */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .settings-btn-save {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--bg-base);
+            border: none;
+            padding: 0.85rem 2rem;
+            border-radius: 12px;
+            font-family: var(--font-family);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .settings-btn-save:hover {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Toast message banner styling */
+        .toast-banner {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid var(--primary);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+            color: var(--text-main);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+        }
+
+        .toast-banner.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Responsive styling */
+        .mobile-bottom-nav {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                display: none; /* Hide sidebar on tablet/mobile */
+            }
+
+            .mobile-bottom-nav {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: rgba(11, 15, 26, 0.95);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border-top: 1px solid var(--border-color);
+                justify-content: space-around;
+                align-items: center;
+                padding: 0.75rem 0.5rem;
+                z-index: 1000;
+            }
+
+            .mobile-nav-btn {
+                background: transparent;
+                border: none;
+                color: var(--text-secondary);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.25rem;
+                font-family: var(--font-family);
+                font-size: 0.75rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: var(--transition);
+                flex: 1;
+            }
+
+            .mobile-nav-btn.active {
+                color: var(--primary);
+            }
+
+            .mobile-nav-btn i, .mobile-nav-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .main-workspace {
+                padding: 1.5rem;
+                padding-bottom: 6rem;
+            }
+
+            .chat-view-container {
+                grid-template-columns: 1fr;
+                height: auto;
+                min-height: calc(100vh - 220px);
+            }
+
+            .chat-sidebar {
+                display: none; /* Hide quick chips on mobile */
+            }
+
+            .workout-view-grid, .nutrition-view-grid, .analytics-grid, .settings-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar layout: Desktop -->
+        <aside class="sidebar">
+            <div>
+                <a href="#" class="brand">
+                    <div class="brand-logo">
+                        <i data-lucide="zap"></i>
+                    </div>
+                    <span class="brand-name">Fitness<span>AI</span></span>
+                </a>
+                
+                <nav class="sidebar-nav">
+                    <ul class="menu-list">
+                        <li>
+                            <button class="menu-item-btn active" onclick="switchView('dashboard')">
+                                <i data-lucide="layout-dashboard"></i> Dashboard
+                            </button>
+                        </li>
+                        <li>
+                            <button class="menu-item-btn" onclick="switchView('coach')">
+                                <i data-lucide="message-square"></i> AI Coach
+                            </button>
+                        </li>
+                        <li>
+                            <button class="menu-item-btn" onclick="switchView('workout')">
+                                <i data-lucide="dumbbell"></i> Workout Planner
+                            </button>
+                        </li>
+                        <li>
+                            <button class="menu-item-btn" onclick="switchView('nutrition')">
+                                <i data-lucide="apple"></i> Nutrition Log
+                            </button>
+                        </li>
+                        <li>
+                            <button class="menu-item-btn" onclick="switchView('analytics')">
+                                <i data-lucide="trending-up"></i> Analytics
+                            </button>
+                        </li>
+                        <li>
+                            <button class="menu-item-btn" onclick="switchView('settings')">
+                                <i data-lucide="settings"></i> Settings
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Profile widget -->
+            <div class="sidebar-profile">
+                <div class="profile-avatar" id="sidebarAvatar">U</div>
+                <div class="profile-details">
+                    <span class="profile-name" id="sidebarName">User Profile</span>
+                    <span class="profile-subtitle">Free Plan Member</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main workspace pane -->
+        <main class="main-workspace">
+            
+            <!-- Dashboard Title/Greetings -->
+            <header class="dashboard-header">
+                <div class="user-welcome">
+                    <h1 id="welcomeGreeting">Hello, Champ!</h1>
+                    <p>Unlock your physical peak with intelligent tracking.</p>
+                </div>
+                <div class="date-badge">
+                    <i data-lucide="calendar"></i>
+                    <span id="currentDateDisplay">July 3, 2026</span>
+                </div>
+            </header>
+
+            <!-- ================= VIEW 1: DASHBOARD ================= -->
+            <section id="view-dashboard" class="view-section active">
+                
+                <!-- Daily stats indicators grid -->
+                <div class="stats-grid">
+                    <!-- Calorie Card -->
+                    <div class="glass-card stat-card calories-theme">
+                        <div class="stat-info">
+                            <h3>Calories Burned</h3>
+                            <div class="value" id="dashCalories">450 <span style="font-size: 1rem; font-weight:500;">kcal</span></div>
+                            <div class="target" id="targetCalorieText">Target: 800 kcal</div>
+                        </div>
+                        <div class="progress-ring-container">
+                            <svg width="64" height="64">
+                                <circle stroke="rgba(255,255,255,0.03)" stroke-width="6" fill="transparent" r="26" cx="32" cy="32"/>
+                                <circle class="progress-ring-circle" id="calorieRing" stroke="var(--danger)" stroke-width="6" stroke-linecap="round" fill="transparent" r="26" cx="32" cy="32" stroke-dasharray="163.36" stroke-dashoffset="163.36"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Steps Card -->
+                    <div class="glass-card stat-card steps-theme">
+                        <div class="stat-info">
+                            <h3>Daily Steps</h3>
+                            <div class="value" id="dashSteps">7,420</div>
+                            <div class="target" id="targetStepsText">Target: 10,000</div>
+                        </div>
+                        <div class="progress-ring-container">
+                            <svg width="64" height="64">
+                                <circle stroke="rgba(255,255,255,0.03)" stroke-width="6" fill="transparent" r="26" cx="32" cy="32"/>
+                                <circle class="progress-ring-circle" id="stepsRing" stroke="var(--primary)" stroke-width="6" stroke-linecap="round" fill="transparent" r="26" cx="32" cy="32" stroke-dasharray="163.36" stroke-dashoffset="163.36"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Minutes Card -->
+                    <div class="glass-card stat-card minutes-theme">
+                        <div class="stat-info">
+                            <h3>Active Time</h3>
+                            <div class="value" id="dashActiveMins">45 <span style="font-size: 1.1rem; font-weight:500;">min</span></div>
+                            <div class="target">Target: 60 min</div>
+                        </div>
+                        <div class="progress-ring-container">
+                            <svg width="64" height="64">
+                                <circle stroke="rgba(255,255,255,0.03)" stroke-width="6" fill="transparent" r="26" cx="32" cy="32"/>
+                                <circle class="progress-ring-circle" id="activeRing" stroke="var(--secondary)" stroke-width="6" stroke-linecap="round" fill="transparent" r="26" cx="32" cy="32" stroke-dasharray="163.36" stroke-dashoffset="163.36"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Water Card -->
+                    <div class="glass-card stat-card water-theme">
+                        <div class="stat-info">
+                            <h3>Water Intake</h3>
+                            <div class="value" id="dashWater">1,250 <span style="font-size: 1.1rem; font-weight:500;">ml</span></div>
+                            <div class="target" id="targetWaterText">Target: 3,000 ml</div>
+                        </div>
+                        <div class="progress-ring-container">
+                            <svg width="64" height="64">
+                                <circle stroke="rgba(255,255,255,0.03)" stroke-width="6" fill="transparent" r="26" cx="32" cy="32"/>
+                                <circle class="progress-ring-circle" id="waterRing" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" fill="transparent" r="26" cx="32" cy="32" stroke-dasharray="163.36" stroke-dashoffset="163.36"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Water visualizer & Quick activities block -->
+                <div class="water-dashboard-widget">
+                    
+                    <!-- Interactive cup visualizer -->
+                    <div class="glass-card glass-water-visualizer">
+                        <h4 style="font-size: 1.1rem; font-weight: 600; text-align: center; margin-bottom: 0.5rem; color: var(--secondary)">
+                            <i data-lucide="droplet" style="display:inline; vertical-align:middle; width:18px; margin-right:4px;"></i> Hydration Level
+                        </h4>
+                        
+                        <div class="water-cup-container">
+                            <div class="water-cup-fill" id="waterVisualFill">
+                                <div class="water-cup-wave"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="water-controls">
+                            <div style="display:flex; gap:0.5rem;">
+                                <button class="water-add-btn" onclick="addWaterIntake(250)">
+                                    +250ml
+                                </button>
+                                <button class="water-add-btn" onclick="addWaterIntake(500)">
+                                    +500ml
+                                </button>
+                            </div>
+                            <button class="water-add-btn" style="background:transparent; border:none;" onclick="resetWaterIntake()">
+                                <i data-lucide="rotate-ccw" style="width:14px;"></i> Reset Daily Count
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AI Daily recommendation Quote -->
+                    <div class="glass-card ai-quote-card" style="display:flex; flex-direction:column; justify-content:center;">
+                        <div style="display:flex; gap:1.25rem;">
+                            <div class="ai-avatar-icon">
+                                <i data-lucide="bot"></i>
+                            </div>
+                            <div class="ai-quote-text">
+                                <h4>AI Fitness Coach Recommendation</h4>
+                                <p id="aiDailyRecommendation">"To optimize metabolic performance, align your protein distribution evenly across 4 meals. Given your target calories, aiming for 35g of protein in each serving will maximize muscle protein synthesis. Ensure your steps exceed 10k today for healthy lipolytic signaling!"</p>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 1rem; width:100%; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:0.8rem; color: var(--text-dim);">Updated 5 minutes ago</span>
+                            <button onclick="refreshRecommendation()" class="water-add-btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                                <i data-lucide="refresh-cw" style="width: 12px; height:12px;"></i> Get New Tip
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Habits and Quick Action lists -->
+                <div style="display:grid; grid-template-columns: 1.3fr 1fr; gap:1.5rem;">
+                    <!-- Tracked habits -->
+                    <div class="glass-card">
+                        <h3 style="font-size:1.2rem; font-weight:700; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
+                            <span>Today's Checklist</span>
+                            <span style="font-size:0.8rem; font-weight:400; color:var(--text-secondary);" id="checklistProgress">2/4 Complete</span>
+                        </h3>
+                        <div class="exercise-list">
+                            <div class="exercise-item">
+                                <div class="exercise-details">
+                                    <button class="exercise-checkbox-btn" onclick="toggleDashboardHabit(this, 1)">
+                                        <i data-lucide="check" style="width:14px;height:14px;"></i>
+                                    </button>
+                                    <div class="exercise-info">
+                                        <h4 style="font-size:1rem;">Complete custom AI workout</h4>
+                                        <p>Generate routine in the workout tab</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="exercise-item">
+                                <div class="exercise-details">
+                                    <button class="exercise-checkbox-btn" onclick="toggleDashboardHabit(this, 2)">
+                                        <i data-lucide="check" style="width:14px;height:14px;"></i>
+                                    </button>
+                                    <div class="exercise-info">
+                                        <h4 style="font-size:1rem;">Log all meals for today</h4>
+                                        <p>Maintain caloric tracking goal</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="exercise-item completed">
+                                <div class="exercise-details">
+                                    <button class="exercise-checkbox-btn" onclick="toggleDashboardHabit(this, 3)">
+                                        <i data-lucide="check" style="width:14px;height:14px;"></i>
+                                    </button>
+                                    <div class="exercise-info">
+                                        <h4 style="font-size:1rem;">Hydrate with 2.5L water minimum</h4>
+                                        <p>Log intake increments on dashboard</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="exercise-item completed">
+                                <div class="exercise-details">
+                                    <button class="exercise-checkbox-btn" onclick="toggleDashboardHabit(this, 4)">
+                                        <i data-lucide="check" style="width:14px;height:14px;"></i>
+                                    </button>
+                                    <div class="exercise-info">
+                                        <h4 style="font-size:1rem;">Log today's body weight</h4>
+                                        <p>Keep track in analytics section</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Tools Shortcuts -->
+                    <div class="glass-card" style="display:flex; flex-direction:column; justify-content:space-between;">
+                        <div>
+                            <h3 style="font-size:1.2rem; font-weight:700; margin-bottom:1rem;">Quick Tools</h3>
+                            <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1.5rem;">Access high performance AI algorithms to automate routines instantly.</p>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                            <button class="water-add-btn" style="text-align:left; justify-content:flex-start; padding: 1rem;" onclick="switchView('workout')">
+                                <i data-lucide="zap" style="color:var(--secondary)"></i>
+                                <div style="display:flex; flex-direction:column; text-align:left;">
+                                    <span style="font-size:0.9rem; font-weight:600;">AI Custom Trainer</span>
+                                    <span style="font-size:0.75rem; font-weight:400; color:var(--text-dim)">Generate target muscle plans</span>
+                                </div>
+                            </button>
+                            <button class="water-add-btn" style="text-align:left; justify-content:flex-start; padding: 1rem;" onclick="switchView('nutrition')">
+                                <i data-lucide="cpu" style="color:var(--primary)"></i>
+                                <div style="display:flex; flex-direction:column; text-align:left;">
+                                    <span style="font-size:0.9rem; font-weight:600;">Smart Nutrition Parser</span>
+                                    <span style="font-size:0.75rem; font-weight:400; color:var(--text-dim)">Type meals in plain english</span>
+                                </div>
+                            </button>
+                            <button class="water-add-btn" style="text-align:left; justify-content:flex-start; padding: 1rem;" onclick="switchView('coach')">
+                                <i data-lucide="bot" style="color:var(--accent)"></i>
+                                <div style="display:flex; flex-direction:column; text-align:left;">
+                                    <span style="font-size:0.9rem; font-weight:600;">Consult AI Advisor</span>
+                                    <span style="font-size:0.75rem; font-weight:400; color:var(--text-dim)">Chat with our custom fitness agent</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ================= VIEW 2: AI COACH ================= -->
+            <section id="view-coach" class="view-section">
+                
+                <div class="chat-view-container">
+                    <!-- Left side quick prompts -->
+                    <div class="chat-sidebar">
+                        <h3>Ask AI Assistant</h3>
+                        <button class="prompt-chip" onclick="chatQuickSelect('How much protein do I need per day to build lean mass?')">
+                            "How much protein do I need per day for muscle building?"
+                        </button>
+                        <button class="prompt-chip" onclick="chatQuickSelect('Generate a quick 5-minute active stretching routine for home.')">
+                            "Generate a quick 5-minute warm-up stretching routine."
+                        </button>
+                        <button class="prompt-chip" onclick="chatQuickSelect('What is progressive overload and how do I apply it?')">
+                            "Explain progressive overload and gym progression."
+                        </button>
+                        <button class="prompt-chip" onclick="chatQuickSelect('Can you suggest a diet macro splits for weight loss target?')">
+                            "Suggest diet plan splits for quick weight loss."
+                        </button>
+                    </div>
+
+                    <!-- Right side main message area -->
+                    <div class="chat-main">
+                        <div class="chat-messages" id="chatFeed">
+                            <div class="message-bubble assistant">
+                                <p>Hi there! I am your **Fitness AI Coach**. ⚡</p>
+                                <p>How can I help you today? You can select one of the quick prompts on the left or type your own custom fitness or diet question below.</p>
+                            </div>
+                        </div>
+
+                        <!-- Typing state indicator -->
+                        <div class="chat-messages" id="typingBubble" style="display:none; flex:none; padding: 0.5rem 1.5rem 1rem 1.5rem;">
+                            <div class="message-bubble assistant" style="padding: 0.6rem 1rem;">
+                                <div class="typing-indicator">
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Message input bar -->
+                        <div class="chat-input-bar">
+                            <input type="text" id="chatInputField" class="chat-input" placeholder="Type your fitness or nutrition query here..." onkeypress="handleChatEnter(event)">
+                            <button class="chat-send-btn" onclick="sendChatMessage()">
+                                <i data-lucide="send"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ================= VIEW 3: WORKOUT PLANNER ================= -->
+            <section id="view-workout" class="view-section">
+                
+                <div class="workout-view-grid">
+                    <!-- Setup planner options form -->
+                    <div class="glass-card workout-form-group">
+                        <h3 style="font-size: 1.2rem; font-weight:700; margin-bottom: 0.5rem; display:flex; align-items:center; gap:0.5rem;">
+                            <i data-lucide="sliders" style="color:var(--secondary)"></i> Plan Setup
+                        </h3>
+                        
+                        <div class="form-field">
+                            <label>Training Goal</label>
+                            <select id="workoutGoal" class="form-select">
+                                <option value="hypertrophy">Build Lean Muscle (Hypertrophy)</option>
+                                <option value="weightloss">Fat Burn & Conditioning</option>
+                                <option value="endurance">Athletic Cardio & Endurance</option>
+                                <option value="strength">Raw Power & Strength Training</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label>Experience Level</label>
+                            <select id="workoutLevel" class="form-select">
+                                <option value="beginner">Beginner (Under 6 months)</option>
+                                <option value="intermediate">Intermediate (1-3 years)</option>
+                                <option value="advanced">Advanced (3+ years)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label>Equipment Available</label>
+                            <select id="workoutEquip" class="form-select">
+                                <option value="fullgym">Full Gym (Barbells, Machines)</option>
+                                <option value="dumbbells">Dumbbells & Bench Only</option>
+                                <option value="bodyweight">Bodyweight / No Equipment</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label>Workout Split Focus</label>
+                            <select id="workoutSplit" class="form-select">
+                                <option value="fullbody">Full Body Workout</option>
+                                <option value="upper">Upper Body Target</option>
+                                <option value="lower">Lower Body Target</option>
+                                <option value="core">Core & Stabilization Focus</option>
+                            </select>
+                        </div>
+
+                        <button class="workout-gen-btn" onclick="generateAIWorkout()">
+                            <i data-lucide="cpu" style="width:18px;height:18px;"></i> Generate AI Workout Plan
+                        </button>
+                    </div>
+
+                    <!-- Output list results area -->
+                    <div class="glass-card workout-results-area" id="workoutResults">
+                        <div class="empty-placeholder">
+                            <i data-lucide="dumbbell"></i>
+                            <div>
+                                <h4 style="color:var(--text-main); font-weight:600; font-size:1.1rem; margin-bottom:0.25rem;">No Workout Active</h4>
+                                <p style="font-size:0.9rem;">Select your parameters on the left and click generate to build a dynamic target plan.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ================= VIEW 4: NUTRITION LOG ================= -->
+            <section id="view-nutrition" class="view-section">
+                
+                <div class="nutrition-view-grid">
+                    
+                    <!-- Circular stats + traditional log form -->
+                    <div class="nutrition-card-summary">
+                        <!-- Macros totals container -->
+                        <div class="glass-card">
+                            <div class="macro-tracker-header">
+                                <h3>Macros Breakdown</h3>
+                                <span id="nutriKcalSummary">1,600 / 2,200 kcal</span>
+                            </div>
+                            
+                            <!-- Circular rings dashboard -->
+                            <div style="display:flex; justify-content:space-around; align-items:center; margin: 1.5rem 0;">
+                                <div style="text-align:center;">
+                                    <div class="progress-ring-container" style="margin: 0 auto 0.5rem auto;">
+                                        <svg width="64" height="64">
+                                            <circle stroke="rgba(255,255,255,0.03)" stroke-width="5" fill="transparent" r="27" cx="32" cy="32"/>
+                                            <circle class="progress-ring-circle" id="nutriCalRing" stroke="var(--danger)" stroke-width="5" stroke-linecap="round" fill="transparent" r="27" cx="32" cy="32" stroke-dasharray="169.64" stroke-dashoffset="169.64"/>
+                                        </svg>
+                                        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:0.75rem; font-weight:700;" id="nutriCalPct">0%</div>
+                                    </div>
+                                    <span style="font-size:0.8rem; color:var(--text-secondary); font-weight:500;">Calories</span>
+                                </div>
+                                
+                                <div style="text-align:center;">
+                                    <div class="progress-ring-container" style="margin: 0 auto 0.5rem auto;">
+                                        <svg width="64" height="64">
+                                            <circle stroke="rgba(255,255,255,0.03)" stroke-width="5" fill="transparent" r="27" cx="32" cy="32"/>
+                                            <circle class="progress-ring-circle" id="nutriProRing" stroke="var(--primary)" stroke-width="5" stroke-linecap="round" fill="transparent" r="27" cx="32" cy="32" stroke-dasharray="169.64" stroke-dashoffset="169.64"/>
+                                        </svg>
+                                        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:0.75rem; font-weight:700;" id="nutriProPct">0%</div>
+                                    </div>
+                                    <span style="font-size:0.8rem; color:var(--text-secondary); font-weight:500;">Protein</span>
+                                </div>
+                                
+                                <div style="text-align:center;">
+                                    <div class="progress-ring-container" style="margin: 0 auto 0.5rem auto;">
+                                        <svg width="64" height="64">
+                                            <circle stroke="rgba(255,255,255,0.03)" stroke-width="5" fill="transparent" r="27" cx="32" cy="32"/>
+                                            <circle class="progress-ring-circle" id="nutriCarRing" stroke="var(--secondary)" stroke-width="5" stroke-linecap="round" fill="transparent" r="27" cx="32" cy="32" stroke-dasharray="169.64" stroke-dashoffset="169.64"/>
+                                        </svg>
+                                        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:0.75rem; font-weight:700;" id="nutriCarPct">0%</div>
+                                    </div>
+                                    <span style="font-size:0.8rem; color:var(--text-secondary); font-weight:500;">Carbs</span>
+                                </div>
+                            </div>
+
+                            <!-- Progress bars -->
+                            <div class="macro-bar-container">
+                                <div class="macro-label">
+                                    <span class="name">Protein</span>
+                                    <span class="fraction" id="barProteinText">0g / 150g</span>
+                                </div>
+                                <div class="macro-bar-track">
+                                    <div class="macro-bar-fill protein-fill" id="barProteinFill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="macro-bar-container">
+                                <div class="macro-label">
+                                    <span class="name">Carbohydrates</span>
+                                    <span class="fraction" id="barCarbsText">0g / 220g</span>
+                                </div>
+                                <div class="macro-bar-track">
+                                    <div class="macro-bar-fill carbs-fill" id="barCarbsFill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="macro-bar-container">
+                                <div class="macro-label">
+                                    <span class="name">Fats</span>
+                                    <span class="fraction" id="barFatsText">0g / 70g</span>
+                                </div>
+                                <div class="macro-bar-track">
+                                    <div class="macro-bar-fill fats-fill" id="barFatsFill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Custom manual food logging form -->
+                        <div class="glass-card">
+                            <h3 style="font-size: 1.2rem; font-weight:700; margin-bottom: 1rem; display:flex; align-items:center; gap:0.5rem;">
+                                <i data-lucide="plus-circle" style="color:var(--primary)"></i> Log Meal Manually
+                            </h3>
+                            <div style="display:flex; flex-direction:column; gap:0.85rem;">
+                                <input type="text" id="manualMealName" class="form-input" placeholder="Meal Name (e.g. Scrambled eggs)">
+                                
+                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
+                                    <div class="form-field">
+                                        <label style="font-size:0.75rem;">Calories (kcal)</label>
+                                        <input type="number" id="manualMealCal" class="form-input" placeholder="0">
+                                    </div>
+                                    <div class="form-field">
+                                        <label style="font-size:0.75rem;">Protein (g)</label>
+                                        <input type="number" id="manualMealPro" class="form-input" placeholder="0">
+                                    </div>
+                                </div>
+                                
+                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
+                                    <div class="form-field">
+                                        <label style="font-size:0.75rem;">Carbs (g)</label>
+                                        <input type="number" id="manualMealCar" class="form-input" placeholder="0">
+                                    </div>
+                                    <div class="form-field">
+                                        <label style="font-size:0.75rem;">Fats (g)</label>
+                                        <input type="number" id="manualMealFat" class="form-input" placeholder="0">
+                                    </div>
+                                </div>
+
+                                <button class="workout-gen-btn" onclick="addManualMeal()">
+                                    <i data-lucide="plus" style="width:16px;"></i> Add Log Entry
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI smart parser and Food List -->
+                    <div style="display:flex; flex-direction:column; gap:1.5rem; height:100%;">
+                        <!-- AI parser -->
+                        <div class="glass-card ai-parser-card">
+                            <div class="ai-parser-header">
+                                <div class="ai-avatar-icon" style="width:36px; height:36px; border-radius:10px;">
+                                    <i data-lucide="cpu" style="width:16px;"></i>
+                                </div>
+                                <h4>AI Smart Meal Parser</h4>
+                            </div>
+                            <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:0.75rem;">Type what you ate naturally and the AI algorithm will estimate the calories and macros automatically.</p>
+                            <textarea id="aiParserTextarea" class="parser-textarea" placeholder="E.g., I had 2 chicken breasts with white rice and an avocado..."></textarea>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:0.75rem; color:var(--text-dim);">Estimates based on USDA food database</span>
+                                <button class="parser-submit-btn" onclick="parseAIMeal()">
+                                    <i data-lucide="sparkles" style="width:14px; height:14px;"></i> Parse Food Log
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Meals logged list -->
+                        <div class="glass-card" style="flex:1;">
+                            <h3 style="font-size:1.1rem; font-weight:700; border-bottom: 1px solid var(--border-color); padding-bottom:0.75rem;">
+                                Logged Entries
+                            </h3>
+                            <div class="meal-log-list" id="mealLogContainer">
+                                <!-- Empty state -->
+                                <div class="empty-placeholder" style="padding: 2.5rem 0;" id="mealLogEmpty">
+                                    <i data-lucide="apple" style="width:36px; height:36px;"></i>
+                                    <p style="font-size:0.85rem;">No meals logged today yet.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ================= VIEW 5: ANALYTICS ================= -->
+            <section id="view-analytics" class="view-section">
+                
+                <!-- Input weight and active summary -->
+                <div class="glass-card" style="margin-bottom: 2rem; display:flex; justify-content:space-between; align-items:center; gap: 2rem; flex-wrap: wrap;">
+                    <div style="display:flex; align-items:center; gap:1.25rem;">
+                        <div class="ai-avatar-icon" style="background:var(--secondary-glow); color:var(--secondary);">
+                            <i data-lucide="scale"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size:1.2rem; font-weight:700; margin-bottom:0.15rem;">Biometric Weight Log</h3>
+                            <p style="color:var(--text-secondary); font-size:0.9rem;">Submit current weight to update analytics trend curve.</p>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:0.5rem; align-items:center;">
+                        <input type="number" id="biometricWeightInput" class="form-input" style="width:130px;" placeholder="Weight (kg)">
+                        <button class="workout-gen-btn" style="margin:0; padding:0.8rem 1.5rem;" onclick="logUserWeight()">
+                            Log Weight
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Charts layout -->
+                <div class="analytics-grid">
+                    <!-- Chart 1: Active Calories Burned -->
+                    <div class="glass-card">
+                        <h3 style="font-size:1.1rem; font-weight:600; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem;">
+                            <i data-lucide="bar-chart-2" style="color:var(--danger)"></i> Weekly Active Energy (kcal)
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="activeCaloriesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Weight Spline Chart -->
+                    <div class="glass-card">
+                        <h3 style="font-size:1.1rem; font-weight:600; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem;">
+                            <i data-lucide="trending-up" style="color:var(--secondary)"></i> 30-Day Bodyweight Trend (kg)
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="bodyweightTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ================= VIEW 6: SETTINGS ================= -->
+            <section id="view-settings" class="view-section">
+                
+                <div class="glass-card">
+                    <h3 style="font-size:1.3rem; font-weight:700; border-bottom: 1px solid var(--border-color); padding-bottom: 0.85rem; margin-bottom: 1.5rem;">
+                        Profile & Goal Adjustments
+                    </h3>
+                    
+                    <div class="settings-grid">
+                        <div class="workout-form-group">
+                            <h4 style="font-size:1.05rem; font-weight:600; color:var(--primary); margin-bottom:0.25rem;">Personal Details</h4>
+                            
+                            <div class="form-field">
+                                <label>Full Name</label>
+                                <input type="text" id="setUserName" class="form-input" placeholder="Enter name">
+                            </div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                                <div class="form-field">
+                                    <label>Height (cm)</label>
+                                    <input type="number" id="setUserHeight" class="form-input" placeholder="Height">
+                                </div>
+                                <div class="form-field">
+                                    <label>Current Weight (kg)</label>
+                                    <input type="number" id="setUserWeight" class="form-input" placeholder="Weight">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="workout-form-group">
+                            <h4 style="font-size:1.05rem; font-weight:600; color:var(--secondary); margin-bottom:0.25rem;">Daily Performance Targets</h4>
+                            
+                            <div class="form-field">
+                                <label>Daily Calorie Burn Target (kcal)</label>
+                                <input type="number" id="setTargetCalories" class="form-input" placeholder="E.g. 800">
+                            </div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                                <div class="form-field">
+                                    <label>Steps Target</label>
+                                    <input type="number" id="setTargetSteps" class="form-input" placeholder="E.g. 10000">
+                                </div>
+                                <div class="form-field">
+                                    <label>Water Target (ml)</label>
+                                    <input type="number" id="setTargetWater" class="form-input" placeholder="E.g. 3000">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="border-top:1px solid var(--border-color); padding-top:1.5rem; margin-top:2rem; text-align:right;">
+                        <button class="settings-btn-save" onclick="saveSettings()">
+                            <i data-lucide="save" style="width:16px;"></i> Save Modifications
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- Mobile view Bottom tab navigator -->
+        <nav class="mobile-bottom-nav">
+            <button class="mobile-nav-btn active" id="mob-dash" onclick="switchView('dashboard')">
+                <i data-lucide="layout-dashboard"></i> Dash
+            </button>
+            <button class="mobile-nav-btn" id="mob-coach" onclick="switchView('coach')">
+                <i data-lucide="message-square"></i> Coach
+            </button>
+            <button class="mobile-nav-btn" id="mob-workout" onclick="switchView('workout')">
+                <i data-lucide="dumbbell"></i> Workouts
+            </button>
+            <button class="mobile-nav-btn" id="mob-nutrition" onclick="switchView('nutrition')">
+                <i data-lucide="apple"></i> Food
+            </button>
+            <button class="mobile-nav-btn" id="mob-analytics" onclick="switchView('analytics')">
+                <i data-lucide="trending-up"></i> Trends
+            </button>
+        </nav>
+
+        <!-- Dynamic Success Toast Notifications -->
+        <div class="toast-banner" id="successToast">
+            <div class="toast-icon">
+                <i data-lucide="check-circle-2" style="width:20px; height:20px;"></i>
+            </div>
+            <span id="toastMessage">Dashboard stats updated successfully!</span>
+        </div>
+
+    </div>
+
+    <!-- Application Script logic -->
+    <script>
+        // CORE STATE & CONFIGURATION
+        let state = {
+            profile: {
+                name: "Alex Mercer",
+                height: 182,
+                weight: 78.4,
+                targetCalories: 850,
+                targetSteps: 10000,
+                targetWater: 3000
+            },
+            tracker: {
+                caloriesBurned: 480,
+                stepsCount: 7820,
+                activeMinutes: 45,
+                waterIntake: 1250,
+                todayHabits: {
+                    1: false, // Custom workout
+                    2: false, // Meal logger
+                    3: true,  // Hydrate 2.5L
+                    4: true   // Log weight
+                }
+            },
+            meals: [
+                { id: 1, name: "Egg & Avocado Toast", cal: 380, pro: 18, carb: 32, fat: 18, time: "08:15 AM" },
+                { id: 2, name: "Whey Protein Shake", cal: 160, pro: 30, carb: 4, fat: 2, time: "11:30 AM" },
+                { id: 3, name: "Grilled Chicken Rice Bowl", cal: 620, pro: 45, carb: 65, fat: 12, time: "02:00 PM" }
+            ],
+            analytics: {
+                weeklyKcal: [620, 710, 890, 480, 0, 0, 0], // Monday-Sunday
+                weightHistory: [
+                    { date: "06-05", weight: 79.5 },
+                    { date: "06-12", weight: 79.1 },
+                    { date: "06-19", weight: 78.8 },
+                    { date: "06-26", weight: 78.5 },
+                    { date: "07-03", weight: 78.4 }
+                ]
+            }
+        };
+
+        // UI references
+        let chartsInstance = {};
+        let activeRestTimer = null;
+        let restTimeRemaining = 0;
+
+        // Sound Engine using Web Audio API
+        function triggerSuccessSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(660, ctx.currentTime); // E5
+                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12); // A5
+                
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.005, ctx.currentTime + 0.35);
+                
+                osc.start();
+                osc.stop(ctx.currentTime + 0.35);
+            } catch (e) {
+                console.log("Audio play error", e);
+            }
+        }
+
+        function triggerTickSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1200, ctx.currentTime);
+                gain.gain.setValueAtTime(0.02, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.05);
+            } catch (e) {
+                console.log("Tick audio play error");
+            }
+        }
+
+        // INIT APPLICATION
+        window.addEventListener('DOMContentLoaded', () => {
+            // Load state from localstorage
+            const cached = localStorage.getItem('fitness_ai_state');
+            if (cached) {
+                try {
+                    state = JSON.parse(cached);
+                } catch (e) {
+                    console.error("Localstorage parse failure", e);
+                }
+            }
+
+            // Bind current Date
+            const d = new Date();
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            document.getElementById('currentDateDisplay').innerText = `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+
+            // Initialize Lucide SVG Icons
+            lucide.createIcons();
+
+            // Setup bindings & UI
+            loadUserProfileData();
+            updateDashboardWidgets();
+            renderMealsLog();
+            initCharts();
+            
+            // Sync settings form inputs
+            syncSettingsForm();
+        });
+
+        // VIEW ROUTING CONTROLLER
+        function switchView(viewName) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(view => {
+                view.classList.remove('active');
+            });
+            
+            // Show selected view
+            const targetView = document.getElementById(`view-${viewName}`);
+            if (targetView) targetView.classList.add('active');
+
+            // Deactivate all menu buttons
+            document.querySelectorAll('.menu-item-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Set active class on buttons matching viewName
+            const activeSidebarBtn = Array.from(document.querySelectorAll('.sidebar-nav button')).find(btn => 
+                btn.getAttribute('onclick').includes(viewName)
+            );
+            if (activeSidebarBtn) activeSidebarBtn.classList.add('active');
+
+            // Mobile nav matching
+            const mobBtn = document.getElementById(`mob-${viewName}`);
+            if (mobBtn) mobBtn.classList.add('active');
+
+            // Redraw charts if entering analytics tab to fix dimension scaling bug
+            if (viewName === 'analytics') {
+                setTimeout(() => {
+                    if (chartsInstance.calories) chartsInstance.calories.resize();
+                    if (chartsInstance.weight) chartsInstance.weight.resize();
+                }, 100);
+            }
+        }
+
+        // PROFILE CONFIG ACTIONS
+        function loadUserProfileData() {
+            document.getElementById('sidebarName').innerText = state.profile.name;
+            document.getElementById('sidebarAvatar').innerText = state.profile.name.charAt(0).toUpperCase();
+            document.getElementById('welcomeGreeting').innerText = `Hello, ${state.profile.name.split(' ')[0]}!`;
+            
+            // Stats limits indicators text
+            document.getElementById('targetCalorieText').innerText = `Target: ${state.profile.targetCalories} kcal`;
+            document.getElementById('targetStepsText').innerText = `Target: ${state.profile.targetSteps.toLocaleString()}`;
+            document.getElementById('targetWaterText').innerText = `Target: ${state.profile.targetWater} ml`;
+        }
+
+        function syncSettingsForm() {
+            document.getElementById('setUserName').value = state.profile.name;
+            document.getElementById('setUserHeight').value = state.profile.height;
+            document.getElementById('setUserWeight').value = state.profile.weight;
+            document.getElementById('setTargetCalories').value = state.profile.targetCalories;
+            document.getElementById('setTargetSteps').value = state.profile.targetSteps;
+            document.getElementById('setTargetWater').value = state.profile.targetWater;
+            document.getElementById('biometricWeightInput').value = state.profile.weight;
+        }
+
+        function saveSettings() {
+            state.profile.name = document.getElementById('setUserName').value.trim() || state.profile.name;
+            state.profile.height = parseFloat(document.getElementById('setUserHeight').value) || state.profile.height;
+            state.profile.weight = parseFloat(document.getElementById('setUserWeight').value) || state.profile.weight;
+            state.profile.targetCalories = parseInt(document.getElementById('setTargetCalories').value) || state.profile.targetCalories;
+            state.profile.targetSteps = parseInt(document.getElementById('setTargetSteps').value) || state.profile.targetSteps;
+            state.profile.targetWater = parseInt(document.getElementById('setTargetWater').value) || state.profile.targetWater;
+
+            saveStateToDisk();
+            loadUserProfileData();
+            updateDashboardWidgets();
+            
+            triggerSuccessSound();
+            showNotificationToast("Settings successfully saved!");
+            switchView('dashboard');
+        }
+
+        // DISK SAVING UTILITY
+        function saveStateToDisk() {
+            localStorage.setItem('fitness_ai_state', JSON.stringify(state));
+        }
+
+        // TOAST NOTIFICATIONS
+        function showNotificationToast(msg) {
+            const toast = document.getElementById('successToast');
+            document.getElementById('toastMessage').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // STATS PROGRESS CIRCLE CONTROLLER
+        function setProgressOffset(circleElement, targetPercent) {
+            const radius = circleElement.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius;
+            const percent = Math.min(Math.max(targetPercent, 0), 100);
+            const offset = circumference - (percent / 100) * circumference;
+            circleElement.style.strokeDasharray = `${circumference} ${circumference}`;
+            circleElement.style.strokeDashoffset = offset;
+        }
+
+        // UPDATE DASHBOARD WIDGETS RENDER
+        function updateDashboardWidgets() {
+            // Dashboard Values bind
+            document.getElementById('dashCalories').innerHTML = `${state.tracker.caloriesBurned} <span style="font-size: 1rem; font-weight:500;">kcal</span>`;
+            document.getElementById('dashSteps').innerText = state.tracker.stepsCount.toLocaleString();
+            document.getElementById('dashActiveMins').innerHTML = `${state.tracker.activeMinutes} <span style="font-size: 1.1rem; font-weight:500;">min</span>`;
+            document.getElementById('dashWater').innerHTML = `${state.tracker.waterIntake} <span style="font-size: 1.1rem; font-weight:500;">ml</span>`;
+
+            // Progress Circles Offsets calculations
+            const calPct = (state.tracker.caloriesBurned / state.profile.targetCalories) * 100;
+            const stepPct = (state.tracker.stepsCount / state.profile.targetSteps) * 100;
+            const activePct = (state.tracker.activeMinutes / 60) * 100;
+            const waterPct = (state.tracker.waterIntake / state.profile.targetWater) * 100;
+
+            setProgressOffset(document.getElementById('calorieRing'), calPct);
+            setProgressOffset(document.getElementById('stepsRing'), stepPct);
+            setProgressOffset(document.getElementById('activeRing'), activePct);
+            setProgressOffset(document.getElementById('waterRing'), waterPct);
+
+            // Water visualizer level set
+            const visualFillPct = Math.min((state.tracker.waterIntake / state.profile.targetWater) * 100, 100);
+            document.getElementById('waterVisualFill').style.height = `${visualFillPct}%`;
+
+            // Habits count update
+            let completed = 0;
+            const total = Object.keys(state.tracker.todayHabits).length;
+            Object.values(state.tracker.todayHabits).forEach(val => {
+                if (val === true) completed++;
+            });
+            document.getElementById('checklistProgress').innerText = `${completed}/${total} Complete`;
+        }
+
+        // WATER INCREMENTS ACTIONS
+        function addWaterIntake(amount) {
+            state.tracker.waterIntake += amount;
+            
+            // Auto complete hydration habit if target reached
+            if (state.tracker.waterIntake >= state.profile.targetWater) {
+                state.tracker.todayHabits[3] = true;
+                // Update habit items visually
+                const habitItems = document.querySelectorAll('#view-dashboard .exercise-item');
+                if (habitItems[2]) habitItems[2].classList.add('completed');
+            }
+
+            saveStateToDisk();
+            updateDashboardWidgets();
+            
+            // Dynamic animation popup
+            triggerSuccessSound();
+            showNotificationToast(`Logged +${amount}ml water intake!`);
+        }
+
+        function resetWaterIntake() {
+            state.tracker.waterIntake = 0;
+            state.tracker.todayHabits[3] = false;
+            
+            const habitItems = document.querySelectorAll('#view-dashboard .exercise-item');
+            if (habitItems[2]) habitItems[2].classList.remove('completed');
+
+            saveStateToDisk();
+            updateDashboardWidgets();
+            showNotificationToast("Daily water count reset to zero.");
+        }
+
+        // HABIT CHECKLIST INTERACTION
+        function toggleDashboardHabit(btn, habitId) {
+            const wrapper = btn.closest('.exercise-item');
+            const isActive = wrapper.classList.toggle('completed');
+            state.tracker.todayHabits[habitId] = isActive;
+            
+            saveStateToDisk();
+            updateDashboardWidgets();
+            triggerSuccessSound();
+        }
+
+        // REFRESH DAILY QUOTE
+        const mockTips = [
+            "Aim to distribute your protein meals roughly 3-4 hours apart to trigger muscle building maximum signal loops.",
+            "Dehydration decreases workout endurance output by up to 15%. Drinking water consistently sustains force output.",
+            "Weight tracking is most accurate right after waking up before consuming calories. Consistent parameters yield clean charts.",
+            "Increasing step count improves cardiorespiratory base and insulin sensitivity without overloading central nervous system.",
+            "A cup of black coffee 30 minutes before training increases lipolysis (fat breakdown) and elevates baseline athletic focus."
+        ];
+
+        function refreshRecommendation() {
+            const rand = mockTips[Math.floor(Math.random() * mockTips.length)];
+            document.getElementById('aiDailyRecommendation').innerText = `"${rand}"`;
+            showNotificationToast("Refreshed AI Coach recommendation!");
+        }
+
+        // ================= WORKOUT GENERATION ENGINE =================
+        const workoutDatabase = {
+            hypertrophy: {
+                fullbody: [
+                    { name: "Barbell Back Squats", sets: 4, reps: "8-10", weight: "75% 1RM", desc: "Keep chest tall, push knees out, depth below parallel" },
+                    { name: "Flat Dumbbell Press", sets: 3, reps: "10-12", weight: "RPE 8", desc: "Retract scapula, lower controlled, explosive press" },
+                    { name: "Lat Pulldowns (Wide)", sets: 3, reps: "10-12", weight: "RPE 8", desc: "Squeeze shoulder blades, pull bar to upper chest" },
+                    { name: "Romanian Dumbbell Deadlifts", sets: 3, reps: "12", weight: "RPE 8", desc: "Hinge at hips, keep back neutral, stretch hamstrings" }
+                ],
+                upper: [
+                    { name: "Incline Bench Press", sets: 4, reps: "8-10", weight: "70% 1RM", desc: "Control down to upper chest, drive straight up" },
+                    { name: "Seated Cable Row", sets: 4, reps: "10", weight: "RPE 8", desc: "Pull to lower abdomen, hold peak contraction" },
+                    { name: "Standing Overhead Press", sets: 3, reps: "8-10", weight: "RPE 8.5", desc: "Brace core, press barbell overhead, lock out elbows" },
+                    { name: "Incline Dumbbell Bicep Curl", sets: 3, reps: "12", weight: "Light", desc: "Keep elbows pinned back, rotate palms upwards" }
+                ],
+                lower: [
+                    { name: "Leg Press", sets: 4, reps: "10-12", weight: "RPE 8", desc: "Foot placement mid-width, avoid locking knees" },
+                    { name: "Lying Leg Curls", sets: 4, reps: "12-15", weight: "RPE 9", desc: "Keep hips glued to pad, control eccentric phase" },
+                    { name: "Goblet Squats", sets: 3, reps: "15", weight: "Moderate", desc: "Brace dumbbell at chest, drop deep in stance" },
+                    { name: "Standing Calf Raises", sets: 4, reps: "15-20", weight: "RPE 9", desc: "Full stretch at bottom, squeeze peak calves height" }
+                ],
+                core: [
+                    { name: "Hanging Knee Raises", sets: 3, reps: "15", weight: "Bodyweight", desc: "Avoid swinging, curl pelvis up toward ribs" },
+                    { name: "Weighted Ab Crunch Machine", sets: 3, reps: "12-15", weight: "RPE 8", desc: "Contract abdominals fully, slow release" },
+                    { name: "Plank with Shoulder Tap", sets: 3, reps: "60 sec", weight: "Bodyweight", desc: "Keep hips completely level and brace torso" }
+                ]
+            },
+            weightloss: {
+                fullbody: [
+                    { name: "Dumbbell Thrusters", sets: 4, reps: "15", weight: "Light", desc: "Clean squat depth transition into fast overhead press" },
+                    { name: "Kettlebell Swings", sets: 4, reps: "20", weight: "Moderate", desc: "Hinge at hips, squeeze glutes to snap bell forward" },
+                    { name: "Dumbbell Renegade Rows", sets: 3, reps: "12 per side", weight: "Moderate", desc: "Maintain plank, row dumbbell to hip pocket" },
+                    { name: "Burpees (High Intensity)", sets: 3, reps: "15", weight: "Bodyweight", desc: "Chest to floor, explosive vertical hop at top" }
+                ],
+                upper: [
+                    { name: "Dumbbell Shadow Boxing", sets: 3, reps: "90 sec", weight: "1.5kg weights", desc: "Maintain boxing guard stance, throw continuous punches" },
+                    { name: "Push Ups to T-Rotation", sets: 3, reps: "12 total", weight: "Bodyweight", desc: "Perform standard push up, rotate arm up towards ceiling" },
+                    { name: "Assisted Pullups (Fast tempo)", sets: 3, reps: "15", weight: "High assist", desc: "Work vertical pull dynamics rapidly" }
+                ],
+                lower: [
+                    { name: "Jump Squats", sets: 4, reps: "20", weight: "Bodyweight", desc: "Soft landing, load hamstrings, jump explosively" },
+                    { name: "Walking Dumbbell Lunges", sets: 3, reps: "20 total steps", weight: "Moderate", desc: "Step forward, drop rear knee near floor" },
+                    { name: "Kettlebell Sumo Squat Jump", sets: 3, reps: "15", weight: "Light", desc: "Wide sumo stance, light jump off floor" }
+                ],
+                core: [
+                    { name: "Mountain Climbers (Sprint)", sets: 4, reps: "45 sec", weight: "Bodyweight", desc: "Drive knees fast to chest, keep back low" },
+                    { name: "Russian Twists", sets: 3, reps: "30 total", weight: "5kg ball", desc: "Lean back, rotate trunk fully side to side" },
+                    { name: "Bicycle Crunches", sets: 3, reps: "40 total", weight: "Bodyweight", desc: "Elbow to opposite knee, slow extension" }
+                ]
+            }
+        };
+
+        function generateAIWorkout() {
+            const goal = document.getElementById('workoutGoal').value;
+            const level = document.getElementById('workoutLevel').value;
+            const equip = document.getElementById('workoutEquip').value;
+            const split = document.getElementById('workoutSplit').value;
+
+            // Simple map fallback if category is strength or endurance (map to hypertrophy or weightloss)
+            let lookupGoal = goal;
+            if (goal === 'strength') lookupGoal = 'hypertrophy';
+            if (goal === 'endurance') lookupGoal = 'weightloss';
+
+            let exercises = (workoutDatabase[lookupGoal] && workoutDatabase[lookupGoal][split]) 
+                ? workoutDatabase[lookupGoal][split] 
+                : workoutDatabase['hypertrophy']['fullbody'];
+
+            // Adjust reps and weight instructions according to level or equipment
+            exercises = exercises.map(ex => {
+                let adjusted = { ...ex };
+                if (equip === 'bodyweight') {
+                    adjusted.name = adjusted.name.replace(/Barbell|Dumbbell|Leg Press/g, 'Bodyweight');
+                    adjusted.weight = "Bodyweight";
+                    if (typeof adjusted.reps === 'string' && !adjusted.reps.includes('sec')) {
+                        let baseVal = parseInt(adjusted.reps) || 12;
+                        adjusted.reps = `${baseVal + 5}`;
+                    }
+                } else if (equip === 'dumbbells') {
+                    adjusted.name = adjusted.name.replace(/Barbell/g, 'Dumbbell');
+                    adjusted.name = adjusted.name.replace(/Leg Press/g, 'Dumbbell Squat');
+                    adjusted.weight = "Dumbbells Only";
+                }
+
+                if (level === 'beginner') {
+                    adjusted.sets = Math.max(2, adjusted.sets - 1);
+                    if (typeof adjusted.reps === 'string' && !adjusted.reps.includes('sec')) {
+                        let baseVal = parseInt(adjusted.reps) || 12;
+                        adjusted.reps = `${Math.max(8, baseVal - 2)}`;
+                    }
+                } else if (level === 'advanced') {
+                    adjusted.sets = adjusted.sets + 1;
+                    adjusted.weight = adjusted.weight.replace(/RPE 8/g, 'RPE 9.5');
+                }
+                return adjusted;
+            });
+
+            // Render workout routines list UI
+            const container = document.getElementById('workoutResults');
+            
+            let html = `
+                <div class="plan-header">
+                    <div>
+                        <div class="plan-title" id="activePlanTitle">Generated AI Routine</div>
+                        <p style="color:var(--text-secondary); font-size:0.85rem; margin-top:0.15rem;">Customized active split program</p>
+                    </div>
+                    <div class="plan-meta">
+                        <span class="meta-tag">${split.toUpperCase()}</span>
+                        <span class="meta-tag">${level.toUpperCase()}</span>
+                    </div>
+                </div>
+
+                <div class="exercise-list">
+            `;
+
+            exercises.forEach((ex, idx) => {
+                html += `
+                    <div class="exercise-item" id="ex-item-${idx}">
+                        <div class="exercise-details">
+                            <button class="exercise-checkbox-btn" onclick="toggleExerciseComplete(${idx})">
+                                <i data-lucide="check" style="width:14px;height:14px;"></i>
+                            </button>
+                            <div class="exercise-info">
+                                <h4>${ex.name}</h4>
+                                <p>${ex.desc}</p>
+                            </div>
+                        </div>
+                        <div class="exercise-stats">
+                            ${ex.sets} Sets &times; ${ex.reps}
+                            <span>${ex.weight}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                </div>
+
+                <!-- Interactive rest countdown timer -->
+                <div class="rest-timer-widget">
+                    <div class="timer-info">
+                        <div class="timer-icon-wrapper">
+                            <i data-lucide="timer"></i>
+                        </div>
+                        <div class="timer-text">
+                            <h4 id="timerStateLabel">Rest Interval</h4>
+                            <p>Recommended rest: 60s between sets</p>
+                        </div>
+                    </div>
+                    <div class="timer-controls-group">
+                        <div class="timer-clock" id="timerDisplay">01:00</div>
+                        <div style="display:flex; gap:0.35rem;">
+                            <button class="timer-action-btn" id="timerStartBtn" onclick="toggleRestTimer()">
+                                <i data-lucide="play" style="width:14px;height:14px;" id="timerStartIcon"></i>
+                            </button>
+                            <button class="timer-action-btn" onclick="resetRestTimer()">
+                                <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            lucide.createIcons();
+            
+            // Automatically reset and prepare timer values
+            restTimeRemaining = 60;
+            updateTimerDisplay();
+
+            // Set dashboard active workout habit to in-progress/complete
+            state.tracker.todayHabits[1] = true;
+            updateDashboardWidgets();
+
+            triggerSuccessSound();
+            showNotificationToast("AI Workout routine compiled and loaded!");
+        }
+
+        function toggleExerciseComplete(idx) {
+            const el = document.getElementById(`ex-item-${idx}`);
+            if (el) {
+                el.classList.toggle('completed');
+                triggerSuccessSound();
+            }
+        }
+
+        // TIMER UTILITY LOGIC
+        function updateTimerDisplay() {
+            const minutes = Math.floor(restTimeRemaining / 60);
+            const seconds = restTimeRemaining % 60;
+            document.getElementById('timerDisplay').innerText = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function toggleRestTimer() {
+            const btn = document.getElementById('timerStartBtn');
+            const icon = document.getElementById('timerStartIcon');
+
+            if (activeRestTimer) {
+                // Pause timer
+                clearInterval(activeRestTimer);
+                activeRestTimer = null;
+                icon.setAttribute('data-lucide', 'play');
+                document.getElementById('timerStateLabel').innerText = "Timer Paused";
+                lucide.createIcons();
+            } else {
+                // Start timer
+                icon.setAttribute('data-lucide', 'pause');
+                document.getElementById('timerStateLabel').innerText = "Recovering...";
+                lucide.createIcons();
+
+                activeRestTimer = setInterval(() => {
+                    restTimeRemaining--;
+                    updateTimerDisplay();
+                    
+                    if (restTimeRemaining <= 0) {
+                        clearInterval(activeRestTimer);
+                        activeRestTimer = null;
+                        
+                        // play success audio sound
+                        triggerSuccessSound();
+                        
+                        document.getElementById('timerStateLabel').innerText = "Set Done! Go!";
+                        icon.setAttribute('data-lucide', 'play');
+                        lucide.createIcons();
+                        restTimeRemaining = 60; // reset
+                    } else if (restTimeRemaining <= 3) {
+                        // Tick sound for last 3 seconds
+                        triggerTickSound();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetRestTimer() {
+            if (activeRestTimer) {
+                clearInterval(activeRestTimer);
+                activeRestTimer = null;
+            }
+            document.getElementById('timerStateLabel').innerText = "Rest Interval";
+            const icon = document.getElementById('timerStartIcon');
+            if (icon) {
+                icon.setAttribute('data-lucide', 'play');
+                lucide.createIcons();
+            }
+            restTimeRemaining = 60;
+            updateTimerDisplay();
+        }
+
+        // ================= NUTRITION LOGIC =================
+        function renderMealsLog() {
+            const list = document.getElementById('mealLogContainer');
+            const empty = document.getElementById('mealLogEmpty');
+
+            // Clear previous except empty
+            const items = list.querySelectorAll('.meal-log-item');
+            items.forEach(el => el.remove());
+
+            if (state.meals.length === 0) {
+                empty.style.display = 'flex';
+            } else {
+                empty.style.display = 'none';
+                state.meals.forEach(m => {
+                    const row = document.createElement('div');
+                    row.className = 'meal-log-item';
+                    row.innerHTML = `
+                        <div class="meal-meta">
+                            <h5>${m.name}</h5>
+                            <span>Logged at ${m.time}</span>
+                        </div>
+                        <div class="meal-stats">
+                            <div class="meal-calories">
+                                ${m.cal} kcal
+                                <span>P:${m.pro}g / C:${m.carb}g / F:${m.fat}g</span>
+                            </div>
+                            <button class="meal-delete-btn" onclick="deleteMeal(${m.id})">
+                                <i data-lucide="trash-2" style="width:16px;"></i>
+                            </button>
+                        </div>
+                    `;
+                    list.appendChild(row);
+                });
+                lucide.createIcons();
+            }
+
+            // Compute values and update macro circular indicators
+            updateMacroProgress();
+        }
+
+        function updateMacroProgress() {
+            let totalCal = 0;
+            let totalPro = 0;
+            let totalCarb = 0;
+            let totalFat = 0;
+
+            state.meals.forEach(m => {
+                totalCal += m.cal;
+                totalPro += m.pro;
+                totalCarb += m.carb;
+                totalFat += m.fat;
+            });
+
+            // Target limits
+            const targetCal = state.profile.targetCalories * 2; // Assuming active + base BMR target limit is around double the active target for daily food intake
+            const targetPro = 160; 
+            const targetCarb = 240; 
+            const targetFat = 70; 
+
+            document.getElementById('nutriKcalSummary').innerText = `${totalCal.toLocaleString()} / ${targetCal.toLocaleString()} kcal`;
+            
+            // Progress Percentages
+            const calPct = Math.min((totalCal / targetCal) * 100, 100);
+            const proPct = Math.min((totalPro / targetPro) * 100, 100);
+            const carbPct = Math.min((totalCarb / targetCarb) * 100, 100);
+            const fatPct = Math.min((totalFat / targetFat) * 100, 100);
+
+            // Ring targets
+            setProgressOffset(document.getElementById('nutriCalRing'), calPct);
+            setProgressOffset(document.getElementById('nutriProRing'), proPct);
+            setProgressOffset(document.getElementById('nutriCarRing'), carbPct);
+
+            document.getElementById('nutriCalPct').innerText = `${Math.round(calPct)}%`;
+            document.getElementById('nutriProPct').innerText = `${Math.round(proPct)}%`;
+            document.getElementById('nutriCarPct').innerText = `${Math.round(carbPct)}%`;
+
+            // Progress Bar elements
+            document.getElementById('barProteinText').innerText = `${totalPro}g / ${targetPro}g`;
+            document.getElementById('barProteinFill').style.width = `${proPct}%`;
+            
+            document.getElementById('barCarbsText').innerText = `${totalCarb}g / ${targetCarb}g`;
+            document.getElementById('barCarbsFill').style.width = `${carbPct}%`;
+
+            document.getElementById('barFatsText').innerText = `${totalFat}g / ${targetFat}g`;
+            document.getElementById('barFatsFill').style.width = `${fatPct}%`;
+        }
+
+        function addManualMeal() {
+            const nameField = document.getElementById('manualMealName');
+            const calField = document.getElementById('manualMealCal');
+            const proField = document.getElementById('manualMealPro');
+            const carbField = document.getElementById('manualMealCar');
+            const fatField = document.getElementById('manualMealFat');
+
+            const name = nameField.value.trim();
+            const cal = parseInt(calField.value) || 0;
+            const pro = parseInt(proField.value) || 0;
+            const carb = parseInt(carbField.value) || 0;
+            const fat = parseInt(fatField.value) || 0;
+
+            if (!name) {
+                alert("Please provide a name for the meal.");
+                return;
+            }
+
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+            const item = {
+                id: Date.now(),
+                name: name,
+                cal: cal,
+                pro: pro,
+                carb: carb,
+                fat: fat,
+                time: timeStr
+            };
+
+            state.meals.push(item);
+            
+            // Mark habit checkbox completed
+            state.tracker.todayHabits[2] = true;
+            updateDashboardWidgets();
+
+            saveStateToDisk();
+            renderMealsLog();
+
+            // Clear inputs
+            nameField.value = "";
+            calField.value = "";
+            proField.value = "";
+            carbField.value = "";
+            fatField.value = "";
+
+            triggerSuccessSound();
+            showNotificationToast(`Logged meal: ${name}!`);
+        }
+
+        function deleteMeal(id) {
+            state.meals = state.meals.filter(m => m.id !== id);
+            if (state.meals.length === 0) {
+                state.tracker.todayHabits[2] = false;
+                updateDashboardWidgets();
+            }
+            saveStateToDisk();
+            renderMealsLog();
+            showNotificationToast("Log entry removed.");
+        }
+
+        // AI NUTRITION TEXT LOG PARSER (MOCK DICTIONARY EXTRACTION)
+        const foodDatabase = {
+            egg: { name: "Boiled Eggs", cal: 70, pro: 6, carb: 0.5, fat: 5 },
+            eggs: { name: "Scrambled Eggs", cal: 140, pro: 12, carb: 1, fat: 10 },
+            chicken: { name: "Grilled Chicken Breast", cal: 190, pro: 31, carb: 0, fat: 3.5 },
+            rice: { name: "Steamed Jasmine Rice", cal: 200, pro: 4.5, carb: 45, fat: 0.4 },
+            banana: { name: "Ripe Banana", cal: 105, pro: 1.3, carb: 27, fat: 0.3 },
+            avocado: { name: "Half Avocado", cal: 160, pro: 2, carb: 8.5, fat: 15 },
+            bread: { name: "Whole Wheat Toast", cal: 80, pro: 4, carb: 15, fat: 1 },
+            whey: { name: "Whey Protein Shake", cal: 140, pro: 26, carb: 3, fat: 1.5 },
+            shake: { name: "Whey Protein Shake", cal: 140, pro: 26, carb: 3, fat: 1.5 },
+            salad: { name: "Garden Side Salad", cal: 120, pro: 2, carb: 10, fat: 8 },
+            oats: { name: "Oatmeal Bowl", cal: 150, pro: 5, carb: 27, fat: 2.5 },
+            oatmeal: { name: "Oatmeal Bowl", cal: 150, pro: 5, carb: 27, fat: 2.5 }
+        };
+
+        function parseAIMeal() {
+            const txt = document.getElementById('aiParserTextarea').value.toLowerCase().trim();
+            if (!txt) {
+                alert("Please type a meal description first.");
+                return;
+            }
+
+            // Match words against food dictionary keys
+            let foundItems = [];
+            let caloriesTotal = 0;
+            let pTotal = 0;
+            let cTotal = 0;
+            let fTotal = 0;
+
+            const tokens = txt.replace(/[^a-zA-Z\s]/g, '').split(/\s+/);
+            
+            tokens.forEach(tok => {
+                if (foodDatabase[tok]) {
+                    // Check if already parsed in this prompt to avoid duplicates or scale quantifiers if number exists before it
+                    const data = foodDatabase[tok];
+                    
+                    // Simple heuristic: search for index before the word for a quantity multiplier
+                    let multiplier = 1;
+                    const wordIdx = tokens.indexOf(tok);
+                    if (wordIdx > 0) {
+                        const prevWord = tokens[wordIdx - 1];
+                        const parsedNum = parseInt(prevWord);
+                        if (!isNaN(parsedNum) && parsedNum > 0 && parsedNum <= 10) {
+                            multiplier = parsedNum;
+                        }
+                    }
+
+                    foundItems.push(`${multiplier}x ${data.name}`);
+                    caloriesTotal += (data.cal * multiplier);
+                    pTotal += (data.pro * multiplier);
+                    cTotal += (data.carb * multiplier);
+                    fTotal += (data.fat * multiplier);
+                }
+            });
+
+            if (foundItems.length === 0) {
+                // Fallback default mock meal if input is unrecognized to make it robust
+                caloriesTotal = 420;
+                pTotal = 25;
+                cTotal = 40;
+                fTotal = 12;
+                foundItems.push("AI Parsed Combo Mix");
+            }
+
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+            const finalMeal = {
+                id: Date.now(),
+                name: foundItems.join(', '),
+                cal: caloriesTotal,
+                pro: pTotal,
+                carb: cTotal,
+                fat: fTotal,
+                time: timeStr
+            };
+
+            state.meals.push(finalMeal);
+            state.tracker.todayHabits[2] = true;
+            updateDashboardWidgets();
+
+            saveStateToDisk();
+            renderMealsLog();
+
+            document.getElementById('aiParserTextarea').value = "";
+            
+            triggerSuccessSound();
+            showNotificationToast(`AI Parsed: ${foundItems.length} items logged successfully!`);
+        }
+
+        // ================= AI COACH CHAT SIMULATION =================
+        const coachReplies = {
+            protein: "<p>Protein is critical for tissue building and recovery. Aim for **1.6 to 2.2 grams of protein per kilogram of body weight** daily to build mass effectively.</p><p>Great sources include:</p><ul><li>Chicken breasts (31g/100g)</li><li>Eggs (6g per medium egg)</li><li>Greek Yogurt (10g/100g)</li><li>Whey Isolates (25g per scoop)</li></ul>",
+            stretch: "<p>Here is a rapid 5-minute dynamic flexibility routine:</p><ol><li>**Arm Swings & Circles**: 10 forward, 10 backward (shoulders setup).</li><li>**Torso Twists**: 15 reps slowly side to side.</li><li>**Bodyweight Squats**: 10 reps slowly emphasizing depth.</li><li>**Cossack Squats**: 5 per side stretching adductors.</li><li>**World's Greatest Stretch**: 3 reps per side in deep lunge.</li></ol>",
+            progressive: "<p>**Progressive Overload** is the fundamental driver of muscle growth. You must gradually increase stress on musculoskeletal system over time.</p><p>Methods to apply it:</p><ul><li>**Increase Weight**: Adding load to the bar.</li><li>**Increase Reps**: Doing 12 reps instead of 10.</li><li>**Increase Sets**: Moving from 3 sets to 4.</li><li>**Improve Form**: Controlling tempo and lowering weight slower.</li></ul>",
+            diet: "<p>For weight loss, a **caloric deficit of 300 to 500 kcal** below your TDEE is optimal for retaining lean tissue.</p><p>Recommended macro split target:</p><ul><li>**Protein**: 35-40% of total calories (spares muscles).</li><li>**Carbohydrates**: 35-40% (fuels high-intensity gym output).</li><li>**Fats**: 20-25% (regulates vital hormone baselines).</li></ul>",
+            hello: "<p>Hello! How can I help you crush your fitness goals today? Ask me about training structure, dietary macro splits, or hydration targets!</p>",
+            hi: "<p>Hello! How can I help you crush your fitness goals today? Ask me about training structure, dietary macro splits, or hydration targets!</p>"
+        };
+
+        function chatQuickSelect(query) {
+            document.getElementById('chatInputField').value = query;
+            sendChatMessage();
+        }
+
+        function handleChatEnter(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInputField');
+            const query = input.value.trim();
+            if (!query) return;
+
+            // Render user bubble
+            const chatFeed = document.getElementById('chatFeed');
+            const userBubble = document.createElement('div');
+            userBubble.className = 'message-bubble user';
+            userBubble.innerText = query;
+            chatFeed.appendChild(userBubble);
+            
+            // Reset input
+            input.value = "";
+            chatFeed.scrollTop = chatFeed.scrollHeight;
+
+            // Trigger typing loader bubble
+            const typing = document.getElementById('typingBubble');
+            typing.style.display = 'block';
+
+            // Heuristic match keyword
+            let replyText = "<p>That is an excellent question! Sustaining consistent gym activity and combining it with calibrated caloric counts is the best blueprint to trigger athletic evolution.</p><p>Let me know if you would like me to compile a workout plan or evaluate your nutrition log entries for the day!</p>";
+            
+            const normalized = query.toLowerCase();
+            if (normalized.includes('protein')) replyText = coachReplies.protein;
+            else if (normalized.includes('stretch') || normalized.includes('warm-up') || normalized.includes('warmup')) replyText = coachReplies.stretch;
+            else if (normalized.includes('overload') || normalized.includes('progressive') || normalized.includes('gym')) replyText = coachReplies.progressive;
+            else if (normalized.includes('diet') || normalized.includes('weight loss') || normalized.includes('loss')) replyText = coachReplies.diet;
+            else if (normalized.includes('hello') || normalized.includes('hi ') || normalized.includes('hey')) replyText = coachReplies.hello;
+
+            // Set delay to mimic AI calculations
+            setTimeout(() => {
+                typing.style.display = 'none';
+                
+                const replyBubble = document.createElement('div');
+                replyBubble.className = 'message-bubble assistant';
+                replyBubble.innerHTML = replyText;
+                
+                chatFeed.appendChild(replyBubble);
+                chatFeed.scrollTop = chatFeed.scrollHeight;
+                
+                triggerSuccessSound();
+            }, 1200);
+        }
+
+        // ================= ANALYTICS CHARTING ENGINE =================
+        function initCharts() {
+            // Chart 1: Active Calories Burned (combo bar + steps)
+            const ctxCal = document.getElementById('activeCaloriesChart').getContext('2d');
+            chartsInstance.calories = new Chart(ctxCal, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Active Calories',
+                        data: state.analytics.weeklyKcal,
+                        backgroundColor: 'rgba(244, 63, 94, 0.4)',
+                        borderColor: '#f43f5e',
+                        borderWidth: 2,
+                        borderRadius: 6,
+                        yAxisID: 'y'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8', font: { family: 'Outfit' } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8', font: { family: 'Outfit' } }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: 30-Day weight trend spline
+            const ctxWeight = document.getElementById('bodyweightTrendChart').getContext('2d');
+            const dates = state.analytics.weightHistory.map(h => h.date);
+            const weights = state.analytics.weightHistory.map(h => h.weight);
+
+            chartsInstance.weight = new Chart(ctxWeight, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Weight (kg)',
+                        data: weights,
+                        borderColor: '#06b6d4',
+                        backgroundColor: 'rgba(6, 182, 212, 0.05)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#06b6d4',
+                        pointBorderColor: '#080c14',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8', font: { family: 'Outfit' } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8', font: { family: 'Outfit' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // WEIGHT INPUT LOGGER ACTION
+        function logUserWeight() {
+            const input = document.getElementById('biometricWeightInput');
+            const val = parseFloat(input.value);
+            if (!val || val <= 30 || val >= 250) {
+                alert("Please provide a valid biometric bodyweight input (e.g. 70-120kg).");
+                return;
+            }
+
+            // Update state
+            state.profile.weight = val;
+            
+            const today = new Date();
+            const dateStr = `${(today.getMonth()+1).toString().padStart(2,'0')}-${today.getDate().toString().padStart(2,'0')}`;
+            
+            // Add or overwrite date entry
+            const existIdx = state.analytics.weightHistory.findIndex(h => h.date === dateStr);
+            if (existIdx >= 0) {
+                state.analytics.weightHistory[existIdx].weight = val;
+            } else {
+                state.analytics.weightHistory.push({ date: dateStr, weight: val });
+                if (state.analytics.weightHistory.length > 8) {
+                    state.analytics.weightHistory.shift();
+                }
+            }
+
+            // Mark weight logging habit completed
+            state.tracker.todayHabits[4] = true;
+            updateDashboardWidgets();
+
+            saveStateToDisk();
+            syncSettingsForm();
+            loadUserProfileData();
+
+            // Refresh weight trend chart
+            if (chartsInstance.weight) {
+                chartsInstance.weight.data.labels = state.analytics.weightHistory.map(h => h.date);
+                chartsInstance.weight.data.datasets[0].data = state.analytics.weightHistory.map(h => h.weight);
+                chartsInstance.weight.update();
+            }
+
+            input.value = "";
+            triggerSuccessSound();
+            showNotificationToast(`Biometric weight logged: ${val}kg!`);
+        }
+    </script>
+</body>
+</html>
